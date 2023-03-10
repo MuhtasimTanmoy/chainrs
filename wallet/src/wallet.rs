@@ -1,5 +1,5 @@
-use crate::utils::hash_pub_key;
 use bitcoincash_addr::{Address, HashType, Scheme};
+use crypto::digest::Digest;
 use crypto::ed25519;
 use rand::rngs::OsRng;
 use rand::RngCore;
@@ -12,11 +12,12 @@ pub struct Wallet {
 }
 
 impl Wallet {
+
     pub(crate) fn new() -> Self {
         let mut key: [u8; 32] = [0; 32];
         OsRng.fill_bytes(&mut key);
-        let (secrect_key, public_key) = ed25519::keypair(&key);
-        let (secret_key, public_key) = (secrect_key.to_vec(), public_key.to_vec());
+        let (secret_key, public_key) = ed25519::keypair(&key);
+        let (secret_key, public_key) = (secret_key.to_vec(), public_key.to_vec());
         Wallet {
             secret_key,
             public_key,
@@ -34,4 +35,15 @@ impl Wallet {
         };
         address.encode().unwrap()
     }
+}
+
+pub fn hash_pub_key(pub_key: &mut Vec<u8>) {
+    // let mut hasher1 = Sha256::new();
+    // hasher1.input(pub_key);
+    // hasher1.result(pub_key);
+
+    let mut hasher2 = crypto::ripemd160::Ripemd160::new();
+    hasher2.input(pub_key);
+    pub_key.resize(20, 0);
+    hasher2.result(pub_key);
 }

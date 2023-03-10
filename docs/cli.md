@@ -18,7 +18,7 @@ Output:
 Success
 
 ## Print the addresses in wallet
-cargo run listaddress
+cargo run listaddresses
 
 addresses: 
 3JGDNu6Pnuench1hoXyibBemfYjGT8RHRS
@@ -42,3 +42,9 @@ cargo run send 3JGDNu6Pnuench1hoXyibBemfYjGT8RHRS  36M6fHwAame68se5hhqG1j2kXRujF
 cargo run addblock 3JGDNu6Pnuench1hoXyibBemfYjGT8RHRS // deprecated
 
 ```
+
+
+Run tests inside `wallet` workspace
+
+`cargo test -p wallet --lib`
+

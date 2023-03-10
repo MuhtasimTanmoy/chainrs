@@ -59,7 +59,7 @@ impl UnspentTXUtil {
 
     pub fn count_transactions(&self) -> Result<i32, failure::Error> {
         let mut counter = 0;
-        let db = sled::open("data/utxos")?;
+        let db = sled::open("../../data/utxos")?;
         for kv in db.iter() {
             kv?;
             counter += 1;
@@ -74,7 +74,7 @@ impl UnspentTXUtil {
     ) -> Result<(i32, HashMap<String, Vec<i32>>), failure::Error> {
         let mut unspent_outputs: HashMap<String, Vec<i32>> = HashMap::new();
         let mut accumulated = 0;
-        let db = sled::open("data/utxos")?;
+        let db = sled::open("../../data/utxos")?;
         for kv in db.iter() {
             let (k, v) = kv?;
             let txid = String::from_utf8(k.to_vec())?;
@@ -95,11 +95,11 @@ impl UnspentTXUtil {
     }
 
     /// find_UTXO finds UTXO for a public key hash
-    pub fn find_UTXO(&self, pub_key_hash: &[u8]) -> Result<TxOutputs, failure::Error> {
+    pub fn find_utxo(&self, pub_key_hash: &[u8]) -> Result<TxOutputs, failure::Error> {
         let mut utxos = TxOutputs {
             outputs: Vec::new(),
         };
-        let db = sled::open("data/utxos")?;
+        let db = sled::open("../../data/utxos")?;
         for kv in db.iter() {
             let (_, v) = kv?;
             let outs: TxOutputs = deserialize(&v.to_vec())?;

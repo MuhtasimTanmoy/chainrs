@@ -1,15 +1,14 @@
 use std::collections::HashMap;
-
 use crate::txs::{TXInput, TXOutput};
 use crate::unspent_tx_util::UnspentTXUtil;
 use crate::utils::hash_pub_key;
-use crate::wallet_chain::WalletChain;
 use crypto::digest::Digest;
 use crypto::ed25519;
 use crypto::sha2::Sha256;
 use failure::format_err;
 use log::error;
 use serde::{Deserialize, Serialize};
+use wallet::wallet_chain::WalletChain;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Transaction {
@@ -109,21 +108,21 @@ impl Transaction {
     pub fn sign(
         &mut self,
         private_key: &[u8],
-        prev_TXs: HashMap<String, Transaction>,
+        prev_txs: HashMap<String, Transaction>,
     ) -> Result<(), failure::Error> {
         if self.is_coinbase() {
             return Ok(());
         }
 
         for vin in &self.input {
-            if prev_TXs.get(&vin.txid).unwrap().id.is_empty() {
+            if prev_txs.get(&vin.txid).unwrap().id.is_empty() {
                 return Err(format_err!("ERROR: Previous transaction is not correct"));
             }
         }
 
         let mut tx_copy = self.deep_copy();
         for in_id in 0..tx_copy.input.len() {
-            let prev_Tx = prev_TXs.get(&tx_copy.input[in_id].txid).unwrap();
+            let prev_Tx = prev_txs.get(&tx_copy.input[in_id].txid).unwrap();
             tx_copy.input[in_id].signature.clear();
             tx_copy.input[in_id].pub_key = prev_Tx.output[tx_copy.input[in_id].vout as usize]
                 .pub_key_hash
@@ -183,9 +182,9 @@ impl Transaction {
 
         let mut tx_copy = self.deep_copy();
         for in_id in 0..self.input.len() {
-            let prev_Tx = prev_TXs.get(&self.input[in_id].txid).unwrap();
+            let prev_tx = prev_TXs.get(&self.input[in_id].txid).unwrap();
             tx_copy.input[in_id].signature.clear();
-            tx_copy.input[in_id].pub_key = prev_Tx.output[self.input[in_id].vout as usize]
+            tx_copy.input[in_id].pub_key = prev_tx.output[self.input[in_id].vout as usize]
                 .pub_key_hash
                 .clone();
             tx_copy.id = tx_copy.hash()?;

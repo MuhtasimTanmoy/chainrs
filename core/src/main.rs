@@ -6,7 +6,6 @@ mod blockchain_itr;
 mod blockchain_unspent_tx;
 mod cli;
 mod r#const;
-mod crypto;
 mod mergetx;
 mod message;
 mod message_parser;
@@ -18,8 +17,6 @@ mod transaction;
 mod txs;
 mod unspent_tx_util;
 mod utils;
-mod wallet;
-mod wallet_chain;
 
 fn main() -> Result<(), failure::Error> {
     let mut cli = Cli::new()?;

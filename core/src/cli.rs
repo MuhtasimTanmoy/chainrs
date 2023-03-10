@@ -1,19 +1,21 @@
 use crate::blockchain::Blockchain;
 use crate::transaction::Transaction;
 use crate::unspent_tx_util::UnspentTXUtil;
-use crate::wallet_chain::WalletChain;
 use bitcoincash_addr::Address;
 use clap::{arg, Command};
 use std::process::exit;
+use wallet::wallet_chain::WalletChain;
 
 pub struct Cli {}
 
 impl Cli {
+
     pub fn new() -> Result<Cli, failure::Error> {
         Ok(Cli {})
     }
 
     pub fn run(&mut self) -> Result<(), failure::Error> {
+
         let matches = Command::new("cli")
             .version("0.1")
             .author("test")
@@ -22,12 +24,12 @@ impl Cli {
             .subcommand(
                 Command::new("getbalance")
                     .about("get balance in the blockchain")
-                    .arg(arg!(<ADDRESS>"'The Address it get balance for'")),
+                    .arg(arg!(<ADDRESS>"'The address it get balance for'")),
             )
             .subcommand(
                 Command::new("create")
-                    .about("Create new blochain")
-                    .arg(arg!(<ADDRESS>"'The address to send gensis block reqward to' ")),
+                    .about("Create new blockchain")
+                    .arg(arg!(<ADDRESS>"'The address to send genesis block reward to' ")),
             )
             .subcommand(
                 Command::new("send")
@@ -54,7 +56,7 @@ impl Cli {
                 let pub_key_hash = Address::decode(address).unwrap().body;
                 let bc = Blockchain::new()?;
                 let utxo_util = UnspentTXUtil { chain: bc };
-                let utxos = utxo_util.find_UTXO(&pub_key_hash)?;
+                let utxos = utxo_util.find_utxo(&pub_key_hash)?;
                 let mut balance = 0;
                 for out in utxos.outputs {
                     balance += out.value;

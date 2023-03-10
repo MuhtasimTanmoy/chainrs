@@ -22,7 +22,7 @@ impl Blockchain {
     pub fn new() -> Result<Blockchain, failure::Error> {
         info!("open blockchain");
 
-        let db = sled::open("data/blocks")?;
+        let db = sled::open("../../data/blocks")?;
         let hash = db
             .get("block_head_hash")?
             .expect("Create chain should have created one genesis block");
@@ -37,11 +37,11 @@ impl Blockchain {
     /// creates the genesis block with coinbase transaction
     /// persists in database
     pub fn create_blockchain(address: String) -> Result<Blockchain, failure::Error> {
-        if let Err(_e) = std::fs::remove_dir_all("data/blocks") {
+        if let Err(_e) = std::fs::remove_dir_all("../../data/blocks") {
             info!("bloks not exist to delete")
         }
 
-        let db = sled::open("data/blocks")?;
+        let db = sled::open("../../data/blocks")?;
 
         let coinbase_transaction =
             Transaction::new_coinbase(address, String::from(GENESIS_COINBASE_DATA))?;
@@ -154,20 +154,20 @@ impl Blockchain {
         if tx.is_coinbase() {
             return Ok(true);
         }
-        let prev_TXs = self.get_prev_TXs(tx)?;
-        tx.verify(prev_TXs)
+        let prev_txs = self.get_prev_TXs(tx)?;
+        tx.verify(prev_txs)
     }
 
     fn get_prev_TXs(
         &self,
         tx: &Transaction,
     ) -> Result<HashMap<String, Transaction>, failure::Error> {
-        let mut prev_TXs = HashMap::new();
+        let mut prev_txs = HashMap::new();
         for vin in &tx.input {
             let prev_TX = self.find_transacton(&vin.txid)?;
-            prev_TXs.insert(prev_TX.id.clone(), prev_TX);
+            prev_txs.insert(prev_TX.id.clone(), prev_TX);
         }
-        Ok(prev_TXs)
+        Ok(prev_txs)
     }
 
     pub fn find_transacton(&self, id: &str) -> Result<Transaction, failure::Error> {

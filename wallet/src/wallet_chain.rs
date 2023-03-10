@@ -7,10 +7,12 @@ pub struct WalletChain {
 }
 
 impl WalletChain {
+
     pub fn new() -> Result<WalletChain, failure::Error> {
         let mut wlt = WalletChain {
             wallets: HashMap::<String, Wallet>::new(),
         };
+
         let db = sled::open("data/wallets")?;
         for item in db.into_iter() {
             let i = item?;
@@ -43,7 +45,7 @@ impl WalletChain {
     }
 
     pub fn save_all(&self) -> Result<(), failure::Error> {
-        let db = sled::open("data/wallets")?;
+        let db = sled::open("../../data/wallets")?;
         for (address, wallet) in &self.wallets {
             let data = bincode::serialize(wallet)?;
             db.insert(address, data)?;
@@ -57,11 +59,12 @@ impl WalletChain {
 #[cfg(test)]
 mod test {
     use bitcoincash_addr::Address;
+    use ed25519::signature::rand_core::{OsRng, RngCore};
 
     use super::*;
     use crate::crypto::{SignerUtil, VerifierUtil};
-    use crate::utils::hash_pub_key;
     use rand_core::{OsRng, RngCore};
+    use crate::wallet::hash_pub_key;
 
     #[test]
     fn test_create_wallet_and_hash() {
